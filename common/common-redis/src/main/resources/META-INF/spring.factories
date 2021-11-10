@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.chenyu.common.redis.config.RedisConfig,\
+  com.chenyu.common.redis.service.RedisService
+
