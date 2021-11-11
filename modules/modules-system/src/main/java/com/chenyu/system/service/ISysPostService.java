@@ -1,5 +1,7 @@
 package com.chenyu.system.service;
 
+import com.chenyu.system.domain.SysPost;
+
 import java.util.List;
 
 /**

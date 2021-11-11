@@ -31,7 +31,6 @@ public class SysRole extends BaseEntity {
     /**
      * 角色权限
      */
-
     private String roleKey;
 
     /**

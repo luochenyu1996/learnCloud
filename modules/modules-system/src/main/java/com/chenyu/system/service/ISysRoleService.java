@@ -32,7 +32,7 @@ public interface ISysRoleService {
     public List<SysRole> selectRolesByUserId(Long userId);
 
     /**
-     * 根据用户ID查询角色权限
+     * 根据用户ID查询角色的权限
      *
      * @param userId 用户ID
      * @return 权限列表

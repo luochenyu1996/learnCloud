@@ -1,8 +1,16 @@
 package com.chenyu.common.web.controller;
 
 
+import com.chenyu.common.core.constant.HttpStatus;
 import com.chenyu.common.core.utils.DateUtils;
+import com.chenyu.common.core.utils.StringUtils;
+import com.chenyu.common.core.utils.sql.SqlUtil;
 import com.chenyu.common.web.domain.AjaxResult;
+import com.chenyu.common.web.page.PageDomain;
+import com.chenyu.common.web.page.TableDataInfo;
+import com.chenyu.common.web.page.TableSupport;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
@@ -10,6 +18,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author chen yu
@@ -17,7 +26,6 @@ import java.util.Date;
  */
 public class BaseController {
     protected final Logger logger= LoggerFactory.getLogger(this.getClass());
-
 
     /**
      * @InitBinder   用于在@Controller中标注于方法，表示为当前控制器注册一个属性编辑器或者其他，只对当前的Controller有效。
@@ -32,6 +40,41 @@ public class BaseController {
                 setValue(DateUtils.parseDate(text));
             }
         });
+    }
+
+    /**
+     * 设置请求分页数据
+     *
+     */
+    protected void  startPage(){
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        //起始
+        Integer pageNum = pageDomain.getPageNum();
+        //每页的大小
+        Integer pageSize = pageDomain.getPageSize();
+
+        if(StringUtils.isNotNull(pageNum)&&StringUtils.isNotNull(pageSize)){
+            //要做一下 sql 注入检查
+            String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
+            //分页参数合理化
+            Boolean reasonable = pageDomain.getReasonable();
+            PageHelper.startPage(pageNum,pageSize,orderBy).setReasonable(reasonable);
+        }
+
+    }
+
+
+    /**
+     * 响应请求分页数据
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected TableDataInfo getDataTable(List<?> list) {
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(HttpStatus.SUCCESS);
+        rspData.setRows(list);
+        rspData.setMsg("查询成功");
+        rspData.setTotal(new PageInfo(list).getTotal());
+        return rspData;
     }
 
     /**
