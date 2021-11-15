@@ -118,7 +118,7 @@ public interface ISysUserService {
      * 注册用户信息
      *
      * @param user 用户信息
-     * @return 结果
+     * @return 注册是否成功
      */
     public boolean registerUser(SysUser user);
 

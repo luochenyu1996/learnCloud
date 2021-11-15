@@ -1,5 +1,11 @@
 package com.chenyu.system.service.imple;
 
+import com.chenyu.commom.datascope.annotation.DataScope;
+import com.chenyu.common.core.constant.UserConstants;
+import com.chenyu.common.core.utils.SpringUtils;
+import com.chenyu.common.core.utils.StringUtils;
+import com.chenyu.common.exception.ServiceException;
+import com.chenyu.common.security.utils.SecurityUtils;
 import com.chenyu.system.api.domain.SysUser;
 import com.chenyu.system.mapper.SysUserMapper;
 import com.chenyu.system.service.ISysUserService;
@@ -18,14 +24,14 @@ import java.util.List;
  */
 @Service
 public class SysUserServiceImpl implements ISysUserService {
-    private static final Logger  log = LoggerFactory.getLogger(SysUserServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
     @Autowired
     private SysUserMapper userMapper;
 
 
-
     @Override
+    @DataScope(deptAlias = "d",userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         return userMapper.selectUserList(user);
 
@@ -48,7 +54,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public SysUser selectUserById(Long userId) {
-        return null;
+        return  userMapper.selectUserById(userId);
     }
 
     @Override
@@ -61,9 +67,15 @@ public class SysUserServiceImpl implements ISysUserService {
         return null;
     }
 
+
+
     @Override
     public String checkUserNameUnique(String userName) {
-        return null;
+        int count = userMapper.checkUserNameUnique(userName);
+        if (count > 0) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 
     @Override
@@ -83,17 +95,31 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public void checkUserDataScope(Long userId) {
+        //先判断是否是管理员  是的话直接通过
+        if(!SysUser.isAdmin(SecurityUtils.getUserId())){
+            SysUser sysUser = new SysUser();
+            sysUser.setUserId(userId);
 
+            //todo  这里通过代理是什么意思？
+            List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(sysUser);
+            if (StringUtils.isEmpty(users)) {
+                // 如果查不出数据 则表示没有权限 抛出异常
+                throw new ServiceException("没有权限访问用户数据！");
+            }
+        }
     }
+
+
 
     @Override
     public int insertUser(SysUser user) {
         return 0;
     }
 
+
     @Override
     public boolean registerUser(SysUser user) {
-        return false;
+        return userMapper.insertUser(user) > 0;
     }
 
     @Override
