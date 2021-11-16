@@ -262,6 +262,13 @@
                 <version>${learnCloud.version}</version>
             </dependency>
 
+            <!-- 验证码 -->
+            <dependency>
+                <groupId>com.github.penggle</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

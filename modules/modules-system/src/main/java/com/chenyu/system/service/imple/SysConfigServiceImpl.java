@@ -50,6 +50,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
      * @return 缓存键key
      */
     private String getCacheKey(String configKey) {
+        
         return Constants.SYS_CONFIG_KEY + configKey;
     }
 }

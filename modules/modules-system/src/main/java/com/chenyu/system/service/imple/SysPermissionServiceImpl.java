@@ -47,7 +47,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
             menuSet.add("*:*:*");
         }else{
 
-            menuSet.addAll(menuService.selectMenuPermsByUserId(userId))
+            menuSet.addAll(menuService.selectMenuPermsByUserId(userId));
         }
 
         return null;

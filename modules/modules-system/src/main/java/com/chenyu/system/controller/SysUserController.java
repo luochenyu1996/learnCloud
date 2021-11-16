@@ -14,7 +14,9 @@ import com.chenyu.system.api.domain.SysUser;
 import com.chenyu.system.api.model.LoginUser;
 import com.chenyu.system.service.*;
 import com.chenyu.system.service.imple.SysPermissionServiceImpl;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,25 +64,7 @@ public class SysUserController extends BaseController {
         return getDataTable(list);
     }
 
-   //todo
-    @RequiresPermissions("system:user:export")
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, SysUser user) throws IOException {
 
-    }
-
-    //todo
-    @RequiresPermissions("system:user:import")
-    @PostMapping("/importData")
-    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
-        return  null;
-    }
-
-    //todo
-    @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response) throws IOException {
-
-    }
 
     /**
      * 获取用户信息
@@ -158,21 +142,124 @@ public class SysUserController extends BaseController {
         ajaxResult.put("roles",
                 SysUser.isAdmin(userId)?roles:roles.stream().filter(r->!r.isAdmin()).collect(Collectors.toList())
         );
+        //岗位信息
+        ajaxResult.put("posts", postService.selectPostAll());
+
+        //当前用户的岗位和角色信息
+        if (StringUtils.isNotNull(userId)) {
+            ajaxResult.put(AjaxResult.DATA_TAG, userService.selectUserById(userId));
+            ajaxResult.put("postIds", postService.selectPostListByUserId(userId));
+            ajaxResult.put("roleIds", roleService.selectRoleListByUserId(userId));
+        }
+        return ajaxResult;
+    }
 
 
+    /**
+     * 新增用户信息
+     *
+     */
+    @RequiresPermissions("system:user:add")
+    @PostMapping
+    public AjaxResult add(@Validated @RequestBody SysUser user) {
+        // 问题处理逻辑
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName()))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+        } else if (StringUtils.isNotEmpty(user.getPhonenumber())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        } else if (StringUtils.isNotEmpty(user.getEmail())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
 
+        user.setCreateBy(SecurityUtils.getUsername());
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        return toAjax(userService.insertUser(user));
+    }
+
+    /**
+     *  修改用户
+     *
+     */
+    @RequiresPermissions("system:user:edit")
+    @PutMapping
+    public AjaxResult edit(@Validated @RequestBody SysUser user) {
+        //检查要修改的用户是否是管理员  如果是则不允许修改
+        userService.checkUserAllowed(user);
+        //如果手机号或者邮箱已经在数据库中存在一样的  则不允修改
+        if(StringUtils.isNotEmpty(user.getPhonenumber())&&UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user))){
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }else if (StringUtils.isNotEmpty(user.getEmail()) && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user))) {
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+
+        user.setUpdateBy(SecurityUtils.getUsername());
+        return toAjax(userService.updateUser(user));
+    }
+
+    /**
+     * 删除用户
+     * 批量删除
+     */
+    @RequiresPermissions("system:user:remove")
+    @DeleteMapping("/{userIds}")
+    public AjaxResult remove(@PathVariable Long[] userIds) {
+        if (ArrayUtils.contains(userIds, SecurityUtils.getUserId())) {
+            //判断要删除的用户中是否有当前用户，如果有则返回删除失败，当前用户不能被删除
+            return AjaxResult.error("当前用户不能删除");
+        }
+        return toAjax(userService.deleteUserByIds(userIds));
+    }
+
+    /**
+     * 重置用户密码
+     *
+     */
+    @RequiresPermissions("system:user:edit")
+    @PutMapping("/resetPwd")
+    public AjaxResult resetPwd(@RequestBody SysUser user) {
+        userService.checkUserAllowed(user);
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        user.setUpdateBy(SecurityUtils.getUsername());
+        return toAjax(userService.resetPwd(user));
+    }
+
+    /**
+     * 修改用户状态
+     */
+    @RequiresPermissions("system:user:edit")
+    @PutMapping("/changeStatus")
+    public AjaxResult changeStatus(@RequestBody SysUser user) {
+        userService.checkUserAllowed(user);
+        user.setUpdateBy(SecurityUtils.getUsername());
+        return toAjax(userService.updateUserStatus(user));
     }
 
 
 
 
+    //todo  使用excel 导入相应的数据
 
+    //todo
+    @RequiresPermissions("system:user:export")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysUser user) throws IOException {
 
+    }
 
+    //todo
+    @RequiresPermissions("system:user:import")
+    @PostMapping("/importData")
+    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
+        return  null;
+    }
 
+    //todo
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response) throws IOException {
 
-
-
+    }
 
 
 

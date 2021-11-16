@@ -1,6 +1,4 @@
 package com.chenyu.auth.service;
-
-import com.chenyu.common.core.constant.Constants;
 import com.chenyu.common.core.constant.SecurityConstants;
 import com.chenyu.common.core.constant.UserConstants;
 import com.chenyu.common.core.domian.R;
@@ -15,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * 网关服务
+ *
  * 注册服务 登录服务  登出服务
  *
  * @author chen yu
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SysLoginService {
-
     @Autowired
     private RemoteUserService remoteUserService;
 
@@ -30,13 +29,9 @@ public class SysLoginService {
     /**
      * 用户注册
      *
-     * @param username 用户姓名
-     * @param password 用户密码
      */
     public void register(String username, String password) {
-
-        //先检查一下用户名和密码
-
+        //基本冲突逻辑处理
         if (StringUtils.isAnyBlank(username, password)) {
             throw new ServiceException("用户/密码必须填写");
         }
@@ -61,14 +56,14 @@ public class SysLoginService {
         //todo 记录日志
     }
 
+
+
     /**
      * 用户登录
+     *
      */
     public LoginUser login(String username, String password) {
-
-        // 先对用户名密码进行一些判断
-
-        // 用户名或密码为空 错误
+        //基本逻辑处理
         if (StringUtils.isAnyBlank(username, password)) {
             //todo 记录日志
             throw new ServiceException("用户/密码必须填写");

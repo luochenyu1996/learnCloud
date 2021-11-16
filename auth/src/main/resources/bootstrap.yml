@@ -1,0 +1,33 @@
+#网关服务端口
+server:
+  port: 9090
+
+#网关服务配置
+spring:
+  application:
+    name: auth   #服务名称
+
+  profiles:
+    active: dev  #配置文件环境
+
+  main:
+    allow-bean-definition-overriding: true   # todo 这个是啥
+
+  cloud:
+
+    nacos:
+      discovery:
+        server-addr: 121.43.53.181:8848  #nacos作为注册中心的地址
+      config:
+        server-addr: 121.43.53.181:8848  #nacos作为配置中心的地址
+        file-extension: yml              #nacos中配置文件的格式
+        shared-configs:     #共享配置  todo 这个是啥
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+
+#    sentinel:
+#      eager: true    # 取消控制台懒加载
+#      transport:
+#        port: 8719   #默认也是这个值
+#        # 控制台地址
+#        dashboard: 127.0.0.1:8858
+#        client-ip: localhost

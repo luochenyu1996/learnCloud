@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户服务
+ * 服务间逻辑的调用
  *
  * @author chenyu
  */
@@ -29,6 +30,7 @@ public interface RemoteUserService {
 
     /**
      * 注册用户信息
+     *
      *
      * @param sysUser 用户信息
      * @param source  请求来源

@@ -7,13 +7,18 @@ import com.chenyu.common.core.utils.StringUtils;
 import com.chenyu.common.exception.ServiceException;
 import com.chenyu.common.security.utils.SecurityUtils;
 import com.chenyu.system.api.domain.SysUser;
+import com.chenyu.system.domain.SysUserPost;
+import com.chenyu.system.domain.SysUserRole;
 import com.chenyu.system.mapper.SysUserMapper;
+import com.chenyu.system.mapper.SysUserPostMapper;
+import com.chenyu.system.mapper.SysUserRoleMapper;
 import com.chenyu.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +33,14 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Autowired
     private SysUserMapper userMapper;
+
+    @Autowired
+    private SysUserPostMapper userPostMapper;
+
+
+    @Autowired
+    private SysUserRoleMapper userRoleMapper;
+
 
 
     @Override
@@ -80,16 +93,31 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public String checkPhoneUnique(SysUser user) {
-        return null;
+        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        SysUser info = userMapper.checkPhoneUnique(user.getPhonenumber());
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
+
+
 
     @Override
     public String checkEmailUnique(SysUser user) {
-        return null;
+        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        SysUser info = userMapper.checkEmailUnique(user.getEmail());
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 
     @Override
     public void checkUserAllowed(SysUser user) {
+        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin()) {
+            throw new ServiceException("不允许操作超级管理员用户");
+        }
 
     }
 
@@ -100,7 +128,7 @@ public class SysUserServiceImpl implements ISysUserService {
             SysUser sysUser = new SysUser();
             sysUser.setUserId(userId);
 
-            //todo  这里通过代理是什么意思？
+            //todo  这里通过代理是什么意思？  获取代理后的对象去调用?
             List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(sysUser);
             if (StringUtils.isEmpty(users)) {
                 // 如果查不出数据 则表示没有权限 抛出异常
@@ -113,7 +141,13 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public int insertUser(SysUser user) {
-        return 0;
+        // 新增用户信息
+        int rows = userMapper.insertUser(user);
+        // 新增用户岗位关联  新增表 user-post中的信息
+        insertUserPost(user);
+        // 新增用户与角色管理
+        insertUserRole(user);
+        return rows;
     }
 
 
@@ -122,9 +156,20 @@ public class SysUserServiceImpl implements ISysUserService {
         return userMapper.insertUser(user) > 0;
     }
 
+
+
     @Override
     public int updateUser(SysUser user) {
-        return 0;
+        Long userId = user.getUserId();
+        // 删除用户与角色关联
+        userRoleMapper.deleteUserRoleByUserId(userId);
+        // 新增用户与角色管理
+        insertUserRole(user);
+        // 删除用户与岗位关联
+        userPostMapper.deleteUserPostByUserId(userId);
+        // 新增用户与岗位管理
+        insertUserPost(user);
+        return userMapper.updateUser(user);
     }
 
     @Override
@@ -134,7 +179,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public int updateUserStatus(SysUser user) {
-        return 0;
+        return userMapper.updateUser(user);
     }
 
     @Override
@@ -149,7 +194,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public int resetPwd(SysUser user) {
-        return 0;
+        return userMapper.updateUser(user);
     }
 
     @Override
@@ -164,11 +209,66 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public int deleteUserByIds(Long[] userIds) {
-        return 0;
+        for (Long userId : userIds) {
+            checkUserAllowed(new SysUser(userId));
+        }
+        // 删除用户与角色关联
+        userRoleMapper.deleteUserRole(userIds);
+        // 删除用户与岗位关联
+        userPostMapper.deleteUserPost(userIds);
+        return userMapper.deleteUserByIds(userIds);
     }
 
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName) {
         return null;
+    }
+
+    /**
+     * 新增用户岗位信息
+     *
+     */
+    public void  insertUserPost(SysUser user){
+        Long[] postIds = user.getPostIds();
+
+        if (StringUtils.isNotNull(postIds)){
+
+            // 新增用户与岗位管理
+            List<SysUserPost> list = new ArrayList<SysUserPost>();
+
+            for (Long postId : postIds) {
+                SysUserPost up = new SysUserPost();
+                up.setUserId(user.getUserId());
+                up.setPostId(postId);
+                list.add(up);
+            }
+
+            if (list.size() > 0) {
+                //一次性插入
+                userPostMapper.batchUserPost(list);
+            }
+        }
+
+    }
+
+    /**
+     * 新增用户角色信息 对应 user-role表
+     *
+     */
+    public void insertUserRole(SysUser user) {
+        Long[] roles = user.getRoleIds();
+        if (StringUtils.isNotNull(roles)) {
+            // 新增用户与角色管理
+            List<SysUserRole> list = new ArrayList<SysUserRole>();
+            for (Long roleId : roles) {
+                SysUserRole ur = new SysUserRole();
+                ur.setUserId(user.getUserId());
+                ur.setRoleId(roleId);
+                list.add(ur);
+            }
+            if (list.size() > 0) {
+                userRoleMapper.batchUserRole(list);
+            }
+        }
     }
 }

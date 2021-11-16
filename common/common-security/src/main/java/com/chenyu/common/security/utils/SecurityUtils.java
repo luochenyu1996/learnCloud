@@ -87,11 +87,12 @@ public class SecurityUtils {
     /**
      * 使用springSecurity中的密码加密器
      * 生成BCryptPasswordEncoder密码
-     *
+     * BCryptPasswordEncoder方法采用SHA-256 +随机盐+密钥对密码进行加密  是一种Hash摘要算法
      * @param password 密码
      * @return 加密字符串
      */
     public static String encryptPassword(String password) {
+
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(password);
     }
