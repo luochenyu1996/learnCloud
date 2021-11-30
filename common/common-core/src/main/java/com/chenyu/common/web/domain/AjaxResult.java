@@ -81,6 +81,12 @@ public class AjaxResult extends HashMap<String, Object> {
     }
 
 
+    public static AjaxResult error(int code, String msg)
+    {
+        return new AjaxResult(code, msg, null);
+    }
+
+
     public static AjaxResult error(String msg) {
         return AjaxResult.success(msg, null);
     }

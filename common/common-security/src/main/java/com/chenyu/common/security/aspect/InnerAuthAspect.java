@@ -28,10 +28,12 @@ public class InnerAuthAspect implements Ordered {
     @Around("@annotation(innerAuth)")
     public Object innerAround(ProceedingJoinPoint point, InnerAuth innerAuth) throws Throwable {
         //  请求来源
+
         String source = ServletUtils.getRequest().getHeader(SecurityConstants.FROM_SOURCE);
+        System.out.println(source);
 
         //验证是否是内部请求
-        if (StringUtils.equals(SecurityConstants.INNER, source)) {
+        if (!StringUtils.equals(SecurityConstants.INNER, source)) {
             throw new InnerAuthException("没有内部访问权限，不允许访问");
         }
         String userid = ServletUtils.getRequest().getHeader(SecurityConstants.DETAILS_USER_ID);

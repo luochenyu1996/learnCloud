@@ -47,10 +47,12 @@ public class TokenController {
 
     /**
      * 用户登录
+     * done
      *
      */
     @PostMapping("/login")
     public R<?> login(@RequestBody LoginBody form) {
+        //内部服务调用 只是涉及到用户信息的查询
         LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
         // 登录、返回jwtToken
         return R.ok(tokenService.createToken(userInfo));
@@ -59,6 +61,7 @@ public class TokenController {
 
     /**
      * 用户登出
+     * done
      *
      */
     @DeleteMapping("/logout")
@@ -90,4 +93,6 @@ public class TokenController {
         }
         return R.ok();
     }
+
+
 }

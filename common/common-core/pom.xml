@@ -42,7 +42,7 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <!-- Transmittable ThreadLocal -->
+        <!-- Transmittable ThreadLocal 阿里开源的 保存上下文的一个工具-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
@@ -125,7 +125,6 @@
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
         </dependency>
-
 
     </dependencies>
 

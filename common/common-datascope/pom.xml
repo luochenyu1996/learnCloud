@@ -18,7 +18,7 @@
 
     <dependencies>
 
-        <!-- RuoYi Common Security -->
+        <!--  Common Security -->
         <dependency>
             <groupId>com.chenyu</groupId>
             <artifactId>common-security</artifactId>

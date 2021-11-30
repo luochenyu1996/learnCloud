@@ -27,11 +27,11 @@ public class PreAuthorizeAspect {
     }
 
     /**
-     * 对注解
-     *
+     * 这个切面对下面的三个注解
      * @RequiresLogin
      * @RequiresPermissions
-     * @RequiresRoles 起作用
+     * @RequiresRoles
+     * 起作用
      */
     public static final String POINTCUT_SIGN =
             " @annotation(com.chenyu.common.security.annotation.RequiresLogin) || "

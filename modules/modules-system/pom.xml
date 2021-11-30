@@ -3,11 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>leanCloud</artifactId>
+        <artifactId>modules</artifactId>
         <groupId>com.chenyu</groupId>
         <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>modules-system</artifactId>
@@ -16,6 +16,11 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+
+    <description>
+        基础系统模块
+    </description>
+
 
     <dependencies>
 
@@ -88,7 +93,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.1.1.RELEASE</version>
                 <executions>
                     <execution>
                         <goals>
@@ -99,5 +103,7 @@
             </plugin>
         </plugins>
     </build>
+
+
 
 </project>

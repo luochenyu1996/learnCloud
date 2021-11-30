@@ -42,16 +42,12 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
     @Override
     public Set<String> getMenuPermission(Long userId) {
         HashSet<String> menuSet = new HashSet<>();
-
         if(SysUser.isAdmin(userId)){
             menuSet.add("*:*:*");
         }else{
 
             menuSet.addAll(menuService.selectMenuPermsByUserId(userId));
         }
-
-        return null;
+        return menuSet;
     }
-
-
 }

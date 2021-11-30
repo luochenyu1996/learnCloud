@@ -23,26 +23,23 @@ public class JwtUtils {
 
     /**
      * 从数据声明中生成JWT令牌
-     *
      */
-    public  static  String creatToken(Map<String,Object> claims){
-        String jwtToken = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.ES512, secret).compact();
+    public static String creatToken(Map<String, Object> claims) {
+        String jwtToken = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secret).compact();
         return jwtToken;
     }
 
     /**
      * 从JWT令牌中解析除数据声明
-     *
      */
-    public static Claims parseJwtToken(String jwtToken){
-        return  Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).getBody();
+    public static Claims parseJwtToken(String jwtToken) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).getBody();
     }
 
     /**
      * 解析JWT串同时从JWT串中返回用户名
-     *
      */
-    public static String  getUserName(String jwtToken){
+    public static String getUserName(String jwtToken) {
         //进行解析
         Claims claims = parseJwtToken(jwtToken);
         //获取用户信息进行返回
@@ -51,7 +48,6 @@ public class JwtUtils {
 
     /**
      * 根据声明信息信息获取用户名
-     *
      */
     public static String getUserName(Claims claims) {
         return getValue(claims, SecurityConstants.DETAILS_USERNAME);
@@ -68,14 +64,10 @@ public class JwtUtils {
     }
 
 
-
-
-
     /**
      * 根据令牌获取用户标识
      *
      * @param claims 身份信息
-
      */
     public static String getUserKey(Claims claims) {
         return getValue(claims, SecurityConstants.USER_KEY);
@@ -84,7 +76,6 @@ public class JwtUtils {
 
     /**
      * 根据令牌获取用户标识
-     *
      */
     public static String getUserKey(String token) {
         Claims claims = parseJwtToken(token);
@@ -92,18 +83,16 @@ public class JwtUtils {
     }
 
 
-
-
     /**
      * 根据身份信息获取键值
-     *
      */
     public static String getValue(Claims claims, String key) {
         return Convert.toStr(claims.get(key), "");
     }
 
-
-
+    public static Claims parseToken(String token) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    }
 
 
 }

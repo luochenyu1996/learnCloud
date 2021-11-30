@@ -1,6 +1,5 @@
 package com.chenyu.system.service.imple;
 
-import com.chenyu.commom.datascope.annotation.DataScope;
 import com.chenyu.common.core.constant.UserConstants;
 import com.chenyu.common.core.utils.SpringUtils;
 import com.chenyu.common.core.utils.StringUtils;
@@ -17,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,6 @@ public class SysUserServiceImpl implements ISysUserService {
 
 
     @Override
-    @DataScope(deptAlias = "d",userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         return userMapper.selectUserList(user);
 
@@ -62,7 +61,8 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public SysUser selectUserByUserName(String userName) {
-        return null;
+        return userMapper.selectUserByUserName(userName);
+
     }
 
     @Override
@@ -128,7 +128,6 @@ public class SysUserServiceImpl implements ISysUserService {
             SysUser sysUser = new SysUser();
             sysUser.setUserId(userId);
 
-            //todo  这里通过代理是什么意思？  获取代理后的对象去调用?
             List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(sysUser);
             if (StringUtils.isEmpty(users)) {
                 // 如果查不出数据 则表示没有权限 抛出异常
@@ -140,6 +139,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
 
     @Override
+    @Transactional
     public int insertUser(SysUser user) {
         // 新增用户信息
         int rows = userMapper.insertUser(user);

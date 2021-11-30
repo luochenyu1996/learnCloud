@@ -1,4 +1,6 @@
-package com.chenyu.commom.datascope.annotation;
+package com.chenyu.common.datascope.annotation;
+
+import java.lang.annotation.*;
 
 /**
  * 数据范围权限注解
@@ -6,6 +8,9 @@ package com.chenyu.commom.datascope.annotation;
  * @author chen yu
  * @create 2021-11-15 20:11
  */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface DataScope {
 
     /**

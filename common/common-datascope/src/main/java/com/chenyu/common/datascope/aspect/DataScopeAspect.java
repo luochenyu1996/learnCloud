@@ -1,13 +1,13 @@
-package com.chenyu.commom.datascope.aspect;
+package com.chenyu.common.datascope.aspect;
 
-import com.chenyu.commom.datascope.annotation.DataScope;
+
 import com.chenyu.common.core.utils.StringUtils;
+import com.chenyu.common.datascope.annotation.DataScope;
 import com.chenyu.common.security.utils.SecurityUtils;
 import com.chenyu.common.web.domain.BaseEntity;
 import com.chenyu.system.api.domain.SysRole;
 import com.chenyu.system.api.domain.SysUser;
 import com.chenyu.system.api.model.LoginUser;
-import org.apache.commons.collections4.IterableMap;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -73,7 +73,7 @@ public class DataScopeAspect {
         handleDataScope(point, controllerDataScope);
     }
 
-    protected void handleDataScope(final  JoinPoint joinPoint,DataScope controllerDataScope){
+    protected void handleDataScope(final  JoinPoint joinPoint, DataScope controllerDataScope){
         //获取当前用户
         LoginUser loginUser = SecurityUtils.getLoginUser();
 

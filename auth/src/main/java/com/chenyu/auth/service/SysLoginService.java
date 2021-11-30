@@ -25,7 +25,6 @@ public class SysLoginService {
     @Autowired
     private RemoteUserService remoteUserService;
 
-
     /**
      * 用户注册
      *

@@ -40,7 +40,7 @@ public class TokenService {
      */
     public Map<String, Object> createToken(LoginUser loginUser) {
         //跟token相关的UUID  区别与验证码相关的UUID  这个token要转换成jwt格式的
-        String token = IdUtils.fastUUID();
+        String token = IdUtils.fastUUID();//从新生成一个uuid而不是验证码的那个ID
         Long userId = loginUser.getSysUser().getUserId();
         String userName = loginUser.getSysUser().getUserName();
         loginUser.setToken(token);
@@ -98,7 +98,8 @@ public class TokenService {
         LoginUser loginUser = null;
         try {
             if (StringUtils.isNotNull(token)) {
-                loginUser = redisService.getCacheObject(getTokenKey(token));
+                String userkey = JwtUtils.getUserKey(token);
+                loginUser = redisService.getCacheObject(getTokenKey(userkey));
                 return loginUser;
             }
         } catch (Exception e) {
@@ -114,6 +115,20 @@ public class TokenService {
         if (StringUtils.isNotEmpty(token)) {
             String userkey = JwtUtils.getUserKey(token);
             redisService.deleteObject(getTokenKey(userkey));
+        }
+    }
+
+    /**
+     * 验证令牌有效期，相差不足120分钟，自动刷新缓存
+     *
+     * @param loginUser
+     */
+    public void verifyToken(LoginUser loginUser) {
+        long expireTime = loginUser.getExpireTime();
+        long currentTime = System.currentTimeMillis();
+        if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
+        {
+            refreshToken(loginUser);
         }
     }
 

@@ -12,6 +12,17 @@
 
     <artifactId>common-log</artifactId>
 
+    <dependencies>
+
+        <!-- Common Security -->
+        <dependency>
+            <groupId>com.chenyu</groupId>
+            <artifactId>common-security</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>

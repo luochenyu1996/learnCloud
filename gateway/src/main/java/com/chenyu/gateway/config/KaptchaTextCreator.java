@@ -1,4 +1,4 @@
-package com.chenyu.gateway.config.properties;
+package com.chenyu.gateway.config;
 
 import com.google.code.kaptcha.text.impl.DefaultTextCreator;
 

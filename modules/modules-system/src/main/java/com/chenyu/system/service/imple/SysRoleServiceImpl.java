@@ -1,5 +1,6 @@
 package com.chenyu.system.service.imple;
 
+import com.chenyu.common.core.utils.SpringUtils;
 import com.chenyu.common.core.utils.StringUtils;
 import com.chenyu.system.api.domain.SysRole;
 import com.chenyu.system.domain.SysUserRole;
@@ -7,6 +8,7 @@ import com.chenyu.system.mapper.SysRoleMapper;
 import com.chenyu.system.service.ISysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -23,10 +25,9 @@ public class SysRoleServiceImpl implements ISysRoleService {
     private SysRoleMapper roleMapper;
 
 
-
     @Override
     public List<SysRole> selectRoleList(SysRole role) {
-        return null;
+        return roleMapper.selectRoleList(role);
     }
 
     @Override
@@ -50,7 +51,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public List<SysRole> selectRoleAll() {
-        return null;
+        SysRoleServiceImpl aopProxy = SpringUtils.getAopProxy(this);
+        return aopProxy.selectRoleList(new SysRole());
     }
 
     @Override
@@ -94,6 +96,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     @Override
+    @Transactional
     public int updateRole(SysRole role) {
         return 0;
     }
