@@ -60,6 +60,7 @@ public class SysUserController extends BaseController {
     @RequiresPermissions(value = "system:user:list")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user) {
+        //使用PageHelper进行分页，这里对原始插件进行了封装
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
@@ -88,7 +89,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据用户ID获取详细信息
-     *
+     * done
      */
     @RequiresPermissions("system:user:query")
     @GetMapping(value = {"/", "/{userId}"})
@@ -115,8 +116,8 @@ public class SysUserController extends BaseController {
 
 
     /**
-     * 新增用户信息
-     *
+     * 新增用户
+     * done
      */
     @RequiresPermissions("system:user:add")
     @PostMapping
@@ -132,8 +133,10 @@ public class SysUserController extends BaseController {
             return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
 
+        //当前新增用户的信息
         user.setCreateBy(SecurityUtils.getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+
         return toAjax(userService.insertUser(user));
     }
 

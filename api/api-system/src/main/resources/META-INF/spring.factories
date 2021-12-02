@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.chenyu.system.api.factory.RemoteUserFallbackFactory,\
+  com.chenyu.system.api.factory.RemoteLogFallbackFactory, \
+  com.chenyu.system.api.factory.RemoteFileFallbackFactory

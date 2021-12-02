@@ -1,5 +1,6 @@
 package com.chenyu.system.api.factory;
 
+
 import com.chenyu.common.core.domian.R;
 import com.chenyu.system.api.RemoteUserService;
 import com.chenyu.system.api.domain.SysUser;
@@ -12,12 +13,11 @@ import org.springframework.stereotype.Component;
 /**
  * 用户服务降级处理
  *
- * @author chenyu
+ * @author ruoyi
  */
 @Component
 public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserService> {
     private static final Logger log = LoggerFactory.getLogger(RemoteUserFallbackFactory.class);
-
 
     @Override
     public RemoteUserService create(Throwable throwable) {
@@ -33,6 +33,5 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
                 return R.fail("注册用户失败:" + throwable.getMessage());
             }
         };
-
     }
 }

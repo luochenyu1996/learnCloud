@@ -6,7 +6,7 @@ import com.chenyu.common.core.utils.ServletUtils;
 /**
  * 表格数据处理
  *
- * @author ruoyi
+ * @author chenyu
  */
 public class TableSupport {
     /**
@@ -39,7 +39,7 @@ public class TableSupport {
      */
     public static PageDomain getPageDomain() {
         PageDomain pageDomain = new PageDomain();
-        //从前端拿到一些分页请求的参数
+        //从请求头中拿到一些分页请求参数，把这些分页请求参数封装成一个 PageDomain 对象
         pageDomain.setPageNum(ServletUtils.getParameterToInt(PAGE_NUM));
         pageDomain.setPageSize(ServletUtils.getParameterToInt(PAGE_SIZE));
         pageDomain.setOrderByColumn(ServletUtils.getParameter(ORDER_BY_COLUMN));

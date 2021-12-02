@@ -25,16 +25,17 @@ import java.util.List;
  * @create 2021-10-29 16:58
  */
 public class BaseController {
-    protected final Logger logger= LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * @InitBinder   用于在@Controller中标注于方法，表示为当前控制器注册一个属性编辑器或者其他，只对当前的Controller有效。
+     * @InitBinder 用于在@Controller中标注于方法，表示为当前控制器注册一个属性编辑器或者其他，只对当前的Controller有效。
+     * <p>
      * WebDataBinder是用来绑定请求参数到指定的属性编辑器.
      */
     //将前台传递过来的日期格式字符串，抓换为 Date:类型
     @InitBinder
-    public void  iniBinder(WebDataBinder binder){
-        binder.registerCustomEditor(Date.class,new PropertyEditorSupport(){
+    public void iniBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Date.class, new PropertyEditorSupport() {
             @Override
             public void setAsText(String text) {
                 setValue(DateUtils.parseDate(text));
@@ -42,23 +43,26 @@ public class BaseController {
         });
     }
 
+
     /**
      * 设置请求分页数据
-     *
      */
-    protected void  startPage(){
+    protected void startPage() {
         PageDomain pageDomain = TableSupport.buildPageRequest();
+
+        //从分页对象中拿出相应的分页数据
         //起始
         Integer pageNum = pageDomain.getPageNum();
         //每页的大小
         Integer pageSize = pageDomain.getPageSize();
 
-        if(StringUtils.isNotNull(pageNum)&&StringUtils.isNotNull(pageSize)){
+        if (StringUtils.isNotNull(pageNum) && StringUtils.isNotNull(pageSize)) {
             //要做一下 sql 注入检查
             String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
             //分页参数合理化
             Boolean reasonable = pageDomain.getReasonable();
-            PageHelper.startPage(pageNum,pageSize,orderBy).setReasonable(reasonable);
+            //开始使用PageHelper进行分页
+            PageHelper.startPage(pageNum, pageSize, orderBy).setReasonable(reasonable);
         }
 
     }
@@ -124,9 +128,6 @@ public class BaseController {
     public AjaxResult error(String message) {
         return AjaxResult.error(message);
     }
-
-
-
 
 
 }
