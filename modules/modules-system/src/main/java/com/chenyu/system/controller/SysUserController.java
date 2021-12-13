@@ -4,6 +4,7 @@ import com.chenyu.common.core.constant.UserConstants;
 import com.chenyu.common.core.domian.R;
 import com.chenyu.common.core.utils.SpringUtils;
 import com.chenyu.common.core.utils.StringUtils;
+import com.chenyu.common.core.utils.poi.ExcelUtil;
 import com.chenyu.common.security.annotation.InnerAuth;
 import com.chenyu.common.security.annotation.RequiresPermissions;
 import com.chenyu.common.security.utils.SecurityUtils;
@@ -204,7 +205,7 @@ public class SysUserController extends BaseController {
      *
      * 系统内部接口
      */
-    @InnerAuth
+//    @InnerAuth
     @GetMapping("/info/{username}")
     public R<LoginUser> info(@PathVariable("username") String username){
         SysUser sysUser = userService.selectUserByUserName(username);
@@ -215,6 +216,7 @@ public class SysUserController extends BaseController {
         Set<String> roles= permissionService.getRolePermission(sysUser.getUserId());
         //获取该用户的权限集合
         Set<String> menuPerms = permissionService.getMenuPermission(sysUser.getUserId());
+
         LoginUser loginUser = new LoginUser();
         loginUser.setSysUser(sysUser);
         loginUser.setRoles(roles);
@@ -227,7 +229,7 @@ public class SysUserController extends BaseController {
      *
      * 系统内部接口
      */
-    @InnerAuth
+//    @InnerAuth
     @PostMapping("/register")
     public R<Boolean> register(@RequestBody SysUser sysUser) {
         String userName = sysUser.getUserName();
@@ -250,13 +252,20 @@ public class SysUserController extends BaseController {
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysUser user) throws IOException {
 
+
     }
 
     //todo
     @RequiresPermissions("system:user:import")
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
-        return  null;
+        ExcelUtil<SysUser> util = new ExcelUtil<>(SysUser.class);
+        List<SysUser> userList = util.importExcel(file.getInputStream());
+        //获取当前操作人员的名字
+        String operName = SecurityUtils.getUsername();
+        String message = userService.importUser(userList, updateSupport, operName);
+        return AjaxResult.success(message);
+
     }
 
     //todo

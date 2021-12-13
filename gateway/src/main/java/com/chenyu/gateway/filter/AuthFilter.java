@@ -24,7 +24,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * 网关鉴权
+ * 网关鉴权 这里对所有的token进行统一过滤
  *
  * @author ruoyi
  */

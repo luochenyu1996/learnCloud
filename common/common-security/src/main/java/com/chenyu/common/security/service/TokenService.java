@@ -68,7 +68,7 @@ public class TokenService {
 
     /**
      * 刷新令牌 同时会把验证通过的用户信息存放到 redis
-     *
+     * <p>
      * 从当前时间进行延长
      */
     public void refreshToken(LoginUser loginUser) {
@@ -126,8 +126,7 @@ public class TokenService {
     public void verifyToken(LoginUser loginUser) {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
-        if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
-        {
+        if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
             refreshToken(loginUser);
         }
     }
@@ -138,6 +137,16 @@ public class TokenService {
      */
     private String getTokenKey(String token) {
         return ACCESS_TOKEN + token;
+    }
+
+
+    /**
+     * 设置用户身份信息
+     */
+    public void setLoginUser(LoginUser loginUser) {
+        if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
+            refreshToken(loginUser);
+        }
     }
 
 

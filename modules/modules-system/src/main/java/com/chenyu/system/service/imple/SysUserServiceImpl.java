@@ -11,6 +11,7 @@ import com.chenyu.system.domain.SysUserRole;
 import com.chenyu.system.mapper.SysUserMapper;
 import com.chenyu.system.mapper.SysUserPostMapper;
 import com.chenyu.system.mapper.SysUserRoleMapper;
+import com.chenyu.system.service.ISysConfigService;
 import com.chenyu.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class SysUserServiceImpl implements ISysUserService {
     private SysUserRoleMapper userRoleMapper;
 
 
+    @Autowired
+    private ISysConfigService configService;
+
 
     @Override
     public List<SysUser> selectUserList(SysUser user) {
@@ -67,7 +71,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public SysUser selectUserById(Long userId) {
-        return  userMapper.selectUserById(userId);
+        return userMapper.selectUserById(userId);
     }
 
     @Override
@@ -79,7 +83,6 @@ public class SysUserServiceImpl implements ISysUserService {
     public String selectUserPostGroup(String userName) {
         return null;
     }
-
 
 
     @Override
@@ -100,7 +103,6 @@ public class SysUserServiceImpl implements ISysUserService {
         }
         return UserConstants.UNIQUE;
     }
-
 
 
     @Override
@@ -124,7 +126,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public void checkUserDataScope(Long userId) {
         //先判断是否是管理员  是的话直接通过
-        if(!SysUser.isAdmin(SecurityUtils.getUserId())){
+        if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
             SysUser sysUser = new SysUser();
             sysUser.setUserId(userId);
 
@@ -137,7 +139,10 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
 
-
+    /**
+     * 导入单个用户信息
+     *
+     */
     @Override
     @Transactional
     public int insertUser(SysUser user) {
@@ -155,7 +160,6 @@ public class SysUserServiceImpl implements ISysUserService {
     public boolean registerUser(SysUser user) {
         return userMapper.insertUser(user) > 0;
     }
-
 
 
     @Override
@@ -219,19 +223,63 @@ public class SysUserServiceImpl implements ISysUserService {
         return userMapper.deleteUserByIds(userIds);
     }
 
+
+    /**
+     * 批量导入用户数据
+     *
+     */
     @Override
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName) {
-        return null;
+        if (StringUtils.isNull(userList) || userList.size() == 0) {
+            throw new ServiceException("导入用户数据不能为空！");
+        }
+        int successNum = 0;
+        int failureNum = 0;
+        StringBuilder successMsg = new StringBuilder();
+        StringBuilder failureMsg = new StringBuilder();
+        String password = configService.selectConfigByKey("sys.user.initPassword");
+        for (SysUser user : userList) {
+            try {
+                // 验证是否存在这个用户
+                SysUser u = userMapper.selectUserByUserName(user.getUserName());
+                if (StringUtils.isNull(u)) {
+                    user.setPassword(SecurityUtils.encryptPassword(password));
+                    user.setCreateBy(operName);
+                    this.insertUser(user);
+                    successNum++;
+                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 导入成功");
+                } else if (isUpdateSupport) {
+                    user.setUpdateBy(operName);
+                    this.updateUser(user);
+                    successNum++;
+                    successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 更新成功");
+                } else {
+                    failureNum++;
+                    failureMsg.append("<br/>" + failureNum + "、账号 " + user.getUserName() + " 已存在");
+                }
+            } catch (Exception e) {
+                failureNum++;
+                String msg = "<br/>" + failureNum + "、账号 " + user.getUserName() + " 导入失败：";
+                failureMsg.append(msg + e.getMessage());
+                log.error(msg, e);
+            }
+        }
+        if (failureNum > 0) {
+            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
+            throw new ServiceException(failureMsg.toString());
+        } else {
+            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+        }
+        return successMsg.toString();
     }
 
     /**
      * 新增用户岗位信息
-     *
      */
-    public void  insertUserPost(SysUser user){
+    public void insertUserPost(SysUser user) {
         Long[] postIds = user.getPostIds();
 
-        if (StringUtils.isNotNull(postIds)){
+        if (StringUtils.isNotNull(postIds)) {
 
             // 新增用户与岗位管理
             List<SysUserPost> list = new ArrayList<SysUserPost>();
@@ -253,7 +301,6 @@ public class SysUserServiceImpl implements ISysUserService {
 
     /**
      * 新增用户角色信息 对应 user-role表
-     *
      */
     public void insertUserRole(SysUser user) {
         Long[] roles = user.getRoleIds();

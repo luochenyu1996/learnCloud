@@ -14,6 +14,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 对 redis 的操作
+ * 可以看看博客
+ * https://juejin.cn/post/6844903715254566926#heading-20
+ *
+ * RedisTemplate对五种数据结构分别定义了操作：
+ *
+ * 1.操作字符串: redisTemplate.opsForValue();
+ * 2.操作hash: redisTemplate.opsForHash();
+ * 3.操作list: redisTemplate.opsForList();
+ * 4.操作set: redisTemplate.opsForSet();
+ * 5.操作zset: redisTemplate.opsForZSet();
+ *
+ * redis 实现分布式锁：
+ *
  *
  * @author chen yu
  * @create 2021-10-20 21:26
@@ -181,7 +194,7 @@ public class RedisService {
     }
 
     /**
-     * 获得缓存的Map
+     * 获得缓存的hash
      *
      * @param key
      * @return

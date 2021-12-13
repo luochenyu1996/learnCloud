@@ -11,6 +11,11 @@ import javax.swing.text.DefaultEditorKit;
 public enum BusinessType {
 
     /**
+     * 其它
+     */
+    OTHER,
+
+    /**
      * 新增
      *
      */

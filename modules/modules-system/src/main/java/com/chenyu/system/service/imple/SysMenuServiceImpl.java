@@ -1,5 +1,6 @@
 package com.chenyu.system.service.imple;
 
+
 import com.chenyu.common.core.constant.Constants;
 import com.chenyu.common.core.constant.UserConstants;
 import com.chenyu.common.core.utils.StringUtils;
@@ -21,15 +22,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 菜单业务层处理类
+ * 菜单 业务层处理
  *
- * @author chen yu
- * @create 2021-11-10 22:55
+ * @author chenyu
  */
 @Service
-public class ISysMenuServiceImpl implements ISysMenuService {
-
-
+public class SysMenuServiceImpl implements ISysMenuService {
     public static final String PREMISSION_STRING = "perms[\"{0}\"]";
 
     @Autowired
@@ -438,5 +436,4 @@ public class ISysMenuServiceImpl implements ISysMenuService {
     private boolean hasChild(List<SysMenu> list, SysMenu t) {
         return getChildList(list, t).size() > 0 ? true : false;
     }
-
 }
