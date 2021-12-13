@@ -1,15 +1,16 @@
 package com.chenyu.system.mapper;
 
+
 import com.chenyu.system.domain.SysConfig;
 
+import java.util.List;
+
 /**
- * 系统配置  持久层
+ * 参数配置 数据层
  *
- * @author chen yu
- * @create 2021-11-11 21:05
+ * @author chenyu
  */
 public interface SysConfigMapper {
-
     /**
      * 查询参数配置信息
      *
@@ -17,4 +18,52 @@ public interface SysConfigMapper {
      * @return 参数配置信息
      */
     public SysConfig selectConfig(SysConfig config);
+
+    /**
+     * 查询参数配置列表
+     *
+     * @param config 参数配置信息
+     * @return 参数配置集合
+     */
+    public List<SysConfig> selectConfigList(SysConfig config);
+
+    /**
+     * 根据键名查询参数配置信息
+     *
+     * @param configKey 参数键名
+     * @return 参数配置信息
+     */
+    public SysConfig checkConfigKeyUnique(String configKey);
+
+    /**
+     * 新增参数配置
+     *
+     * @param config 参数配置信息
+     * @return 结果
+     */
+    public int insertConfig(SysConfig config);
+
+    /**
+     * 修改参数配置
+     *
+     * @param config 参数配置信息
+     * @return 结果
+     */
+    public int updateConfig(SysConfig config);
+
+    /**
+     * 删除参数配置
+     *
+     * @param configId 参数ID
+     * @return 结果
+     */
+    public int deleteConfigById(Long configId);
+
+    /**
+     * 批量删除参数信息
+     *
+     * @param configIds 需要删除的参数ID
+     * @return 结果
+     */
+    public int deleteConfigByIds(Long[] configIds);
 }
